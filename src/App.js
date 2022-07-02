@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import react from "react"
+import  Router  from './routes';
+import jwtDecode from "jwt-decode";
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import {authenticateUser} from "./actions/auth"
+import axios from "axios";
 
-function App() {
+
+function App(props) {
+  useEffect(()=>{
+    const token=localStorage.getItem("token");
+    console.log("TOKEN",token);
+    if(token){
+
+      const user = jwtDecode(token);
+
+      props.dispatch(
+        authenticateUser({
+          email: user.email,
+          _id: user._id,
+          firstName: user.firstName,
+          lastName:user.lastName,
+          role:user.role
+        })
+      );
+
+    }
+
+  },[])
+  
+  console.log("hiiii in app component ")
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+     <Router/>
+    </>
+   
   );
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    auth: state.auth,
+  };
+}
+export default connect(mapStateToProps)(App);
